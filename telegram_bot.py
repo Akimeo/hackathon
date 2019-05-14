@@ -1,6 +1,6 @@
 from telegram.ext import Updater, CommandHandler
 from werkzeug.security import check_password_hash, generate_password_hash
-from db import db, UsersModel
+from data_base import db, UsersModel
 
 
 help_s = """
