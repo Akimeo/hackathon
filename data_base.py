@@ -18,14 +18,13 @@ class TasksModel(db.Model):
     priority = db.Column(db.Integer, unique=False, nullable=False, default=1)
     done_date = db.Column(db.DateTime, unique=False, nullable=True)
     phase = db.Column(db.Integer, unique=False, nullable=False, default=0)
+    deleg_user = db.Column(db.ARRAY, unique=False, nullable=False, default=[])
 
 
 class UsersModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
-    donetasks = db.Column(db.String(), unique=False,
-                          nullable=True, default='[]')
     alice_id = db.Column(db.String(), unique=False, default=0)
     tg_id = db.Column(db.Integer, unique=False, default=0)
 
