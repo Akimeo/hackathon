@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -13,7 +14,6 @@ class TasksModel(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     desc = db.Column(db.String(1000), unique=True, nullable=False)
     author = db.Column(db.Integer, unique=False, nullable=False)
-    user = db.Column(db.Integer, unique=False, nullable=False)
     date = db.Column(db.DateTime, unique=False, nullable=False)
     priority = db.Column(db.Integer, unique=False, nullable=False, default=1)
     phase = db.Column(db.Integer, unique=False, nullable=False, default=0)
@@ -25,7 +25,7 @@ class UsersModel(db.Model):
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
     donetasks = db.Column(db.String(), unique=False,
                           nullable=True, default='[]')
-    alice_id = db.Column(db.Integer, unique=False, default=0)
+    alice_id = db.Column(db.String(), unique=False, default='')
     tg_id = db.Column(db.Integer, unique=False, default=0)
 
 
@@ -34,7 +34,9 @@ if __name__ == '__main__':
     db.create_all()
     user = UsersModel(name='admin', password_hash='admin')
     user1 = UsersModel(name='user1', password_hash='user1')
+    task = TasksModel(name='Это имя', desc='Это описание', author=1, date=datetime.now())
     db.session.add(user)
     db.session.add(user1)
+    db.session.add(task)
     db.session.commit()
     app.run()

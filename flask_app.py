@@ -1,7 +1,7 @@
 from flask import Flask, request
 import logging
 import json
-from data_base import UsersModel
+from data_base import UsersModel, TasksModel
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -37,7 +37,8 @@ def handle_dialog(res, req):
         res['response']['text'] = \
             'Привет! Для авторизации в системе UnderTask введи свой логин!'
         sessionStorage[user_id] = {
-            'login': None
+            'login': None,
+            'password': None
         }
         return
     if sessionStorage[user_id]['login'] is None:
@@ -49,7 +50,7 @@ def handle_dialog(res, req):
             sessionStorage[user_id]['login'] = login
             res['response']['text'] = \
                 'А теперь, ' + login + ', введи свой пароль!'
-    else:
+    elif sessionStorage[user_id]['password'] is None:
         password = check_password(req)
         if password is None:
             res['response']['text'] = \
@@ -57,7 +58,40 @@ def handle_dialog(res, req):
         else:
             sessionStorage[user_id]['password'] = password
             res['response']['text'] = \
-                'Молодец, ты справился!'
+                'Добро пожаловать в систему UnderTask!'
+            res['response']['buttons'] = [
+                {
+                    'title': 'Покажи мои задачи',
+                    'hide': True
+                }
+            ]
+    else:
+        ou = req['request']['original_utterance'].lower()
+        if 'покаж' in ou and 'задач' in ou:
+            res['response']['text'] = show_tasks(req)
+        else:
+            res['response']['text'] = \
+                'Прости, я тебя не поняла!'
+            res['response']['buttons'] = [
+                {
+                    'title': 'Покажи мои задачи',
+                    'hide': True
+                }
+            ]
+
+
+def show_tasks(req):
+    ut_id = db.session.query(UsersModel).filter_by(
+        alice_id=req['session']['user_id']).first().id
+    tasks = db.session.query(TasksModel).filter_by(author=ut_id).all()
+    ans = ''
+    for task in tasks:
+        ans += 'Название: ' + task.name + '\nid: ' + \
+            str(task.id) + '\nДата выполнения: ' + str(task.date) + '\n\n'
+    if ans:
+        return ans
+    else:
+        return 'Пока здесь пусто!'
 
 
 def check_login(req):
@@ -71,7 +105,15 @@ def check_password(req):
     password = req['request']['original_utterance']
     user = db.session.query(UsersModel).filter_by(name=login).first()
     if user.password_hash == password:
+        user.alice_id = req['session']['user_id']
+        db.session.commit()
         return password
+
+
+def find_id(req):
+    user_id = req['session']['user_id']
+    user = db.session.query(UsersModel).filter_by(alice_id=user_id).first()
+    return user.id
 
 
 if __name__ == '__main__':
