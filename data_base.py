@@ -24,8 +24,16 @@ class UsersModel(db.Model):
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
     donetasks = db.Column(db.String(), unique=False,
                           nullable=True, default='[]')
-    alice_id = db.Column(db.Integer, unique=True, default=0)
-    tg_id = db.Column(db.Integer, unique=True, default=0)
+    alice_id = db.Column(db.Integer, unique=False, default=0)
+    tg_id = db.Column(db.Integer, unique=False, default=0)
 
 
-db.create_all()
+if __name__ == '__main__':
+    db.drop_all()
+    db.create_all()
+    user = UsersModel(name='admin', password_hash='admin')
+    user1 = UsersModel(name='user1', password_hash='user1')
+    db.session.add(user)
+    db.session.add(user1)
+    db.session.commit()
+    app.run()

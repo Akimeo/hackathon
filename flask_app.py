@@ -1,11 +1,15 @@
 from flask import Flask, request
-from flask_sqlalchemy import SQLAlchemy
 import logging
 import json
-from db import UsersModel
+from data_base import UsersModel
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vwb.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -58,20 +62,18 @@ def handle_dialog(res, req):
 
 def check_login(req):
     login = req['request']['original_utterance']
-    if UsersModel.query.filter_by(name=login).first():
+    if db.session.query(UsersModel).filter_by(name=login).first():
         return login
 
 
 def check_password(req):
     login = sessionStorage[req['session']['user_id']]['login']
     password = req['request']['original_utterance']
-    user = UsersModel.query.filter_by(name=login).first()
+    user = db.session.query(UsersModel).filter_by(name=login).first()
     if user.password_hash == password:
         return password
 
 
 if __name__ == '__main__':
-    user = UsersModel(name='admin', password_hash='admin', donetasks='')
-    db.session.add(user)
     db.create_all()
     app.run()
