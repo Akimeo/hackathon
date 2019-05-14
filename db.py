@@ -26,3 +26,6 @@ class UsersModel(db.Model):
                           nullable=True, default='[]')
     alice_id = db.Column(db.Integer, unique=True, default=0)
     tg_id = db.Column(db.Integer, unique=True, default=0)
+
+
+db.create_all()
