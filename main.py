@@ -12,6 +12,7 @@ import os
 
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
+deadlines = True
 
 
 @app.route('/')
@@ -20,10 +21,16 @@ def tasks():
         return redirect('/login')
     user_name = session['username']
     tasks = list(db.session.query(TasksModel))
-    authors = [db.session.query(UsersModel).filter_by(id=i.id).first().name for i in list(db.session.query(UsersModel))]
+    if deadlines:
+        tasks = list(db.session.query(TasksModel))
+    else:
+        tasks = list(filter(lambda x: x.date < datetime.now(), tasks))
+    authors = [db.session.query(UsersModel).filter_by(id=i.author).first().name
+               for i in tasks]
     listy = range(len(tasks))
-    users = [db.session.query(UsersModel).filter_by(id=j).first().name for j in [i.user for i in db.session.query(TasksModel)]]
-    return render_template('feed.html', username=user_name, tasks=tasks, listy=listy, id=session['user_id'],authors=authors, users=users)
+    users = [db.session.query(UsersModel).filter_by(id=j).first().name for j in
+             [i.user for i in tasks]]
+    return render_template('feed.html', username=user_name, tasks=tasks, listy=listy, id=session['user_id'],authors=authors, users=users, now=datetime.now())
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -116,7 +123,17 @@ def add_task():
         return redirect('/')
     return render_template('add_tasks.html', username=session['username'], form=form, name='', desc='')
 
+@app.route('/filter-on')
+def filter_on():
+    global deadlines
+    deadlines = False
+    return redirect('/')
 
+@app.route('/filter-off')
+def filter_off():
+    global deadlines
+    deadlines = True
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')

@@ -3,19 +3,30 @@
 {% block content %}
     <h1>Tasks</h1>
     <h3>Filters</h3>
-    <a class="btn btn-primary" href="#" role="button">No Filters</a>
-    <a class="btn btn-primary" href="#" role="button">Too Late</a>
+    <a class="btn btn-primary" href="/filter-off" role="button">No Filters</a>
+    <a class="btn btn-primary" href="/filter-on" role="button">Deadlines</a>
 {% for i in listy %}
-    <div class="alert alert-dark" role="alert">
-        <h3>{{ tasks[i].name }}</h3>
+    {% if tasks[i].date < now %}
+        <div class="alert alert-danger" role="alert">
+            <h2>Deadline ended</h2>
+            <h2>{{ tasks[i].name }}</h2>
         <h4>{{ authors[i] }}</h4>
         <div>{{ tasks[i].desc }}</div>
         <h3>Priority - {{ tasks[i].priority }}</h3>
         <div>Deadline: {{ tasks[i].date }}</div>
-        {% if tasks[i].id == id %}
+        <h4>Deligated to {{ users[i] }}</h4>
+     {% else %}
+        <div class="alert alert-dark" role="alert">
+        <h2>{{ tasks[i].name }}</h2>
+        <h4>{{ authors[i] }}</h4>
+        <div>{{ tasks[i].desc }}</div>
+        <h3>Priority - {{ tasks[i].priority }}</h3>
+        <div>Deadline: {{ tasks[i].date }}</div>
+            <h4>Deligated to {{ users[i] }}</h4>
+            {% if tasks[i].author == id %}
             <a href="/edit-task/{{ tasks[i].id}}">Edit Task</a>
         {% endif %}
-        <h4>Deligated to {{ users[i] }}</h4>
+    {% endif %}
     </div>
 {% endfor %}
 {% endblock %}
