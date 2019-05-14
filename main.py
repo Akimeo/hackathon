@@ -1,6 +1,6 @@
 from flask import Flask, render_template, session, redirect, make_response,\
     jsonify, request
-from forms import LoginForm, RegForm
+from forms import LoginForm, RegForm, AddTaskForm
 from datetime import datetime
 import os
 from flask_sqlalchemy import SQLAlchemy
@@ -8,7 +8,6 @@ from DB import TasksModel, UsersModel, app, db
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 import os
-from sqlalchemy import exists
 
 
 SECRET_KEY = os.urandom(32)
@@ -68,10 +67,21 @@ def reg():
             return redirect("/login")
     return render_template('registration.html', form=form, existence=existence)
 
-@app.route('/add_task', methods=['GET', 'POST'])
+@app.route('/add-task', methods=['GET', 'POST'])
 def add_task():
     if 'username' not in session:
         return redirect('/login')
+    form = AddTaskForm()
+    name = form.name.data
+    desc = form.desc.data
+    priority = form.priority.data
+    print(priority, desc, name)
+    if form.validate_on_submit():
+        task = TasksModel(name=name, desc=desc, author=session['username'], date=':'.join(str(datetime.now()).split(':')[:2]), priority=priority)
+        db.session.add(task)
+        db.commit()
+        return redirect('/')
+    return render_template('add_tasks.html', username=session['username'], form=form)
 
 
 

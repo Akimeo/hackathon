@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+    <h1>Add A Task</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <h5>Author - {{ username }}</h5>
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name }}<br>
+            {% for error in form.name.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+                <p>
+            {{ form.desc.label }}<br>
+            {{ form.desc }}<br>
+            {% for error in form.desc.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+                <p>
+            {{ form.priority.label }}<br>
+            {{ form.priority }}<br>
+            {% for error in form.priority.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
