@@ -15,6 +15,7 @@ class TasksModel(db.Model):
     author = db.Column(db.Integer, unique=False, nullable=False)
     user = db.Column(db.Integer, unique=False, nullable=False)
     date = db.Column(db.DateTime, unique=False, nullable=False)
+    priority = db.Column(db.Integer, unique=False, nullable=False, default=1)
     phase = db.Column(db.Integer, unique=False, nullable=False, default=0)
 
 
