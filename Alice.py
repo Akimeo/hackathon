@@ -5,8 +5,7 @@ import json
 from db import UsersModel
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///under_task.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vwb.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
