@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vwb.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
@@ -22,3 +24,5 @@ class UsersModel(db.Model):
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
     donetasks = db.Column(db.String(), unique=False,
                           nullable=True, default='[]')
+    alice_id = db.Column(db.Integer, unique=True, default=0)
+    tg_id = db.Column(db.Integer, unique=True, default=0)
