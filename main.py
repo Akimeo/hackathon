@@ -19,7 +19,11 @@ def tasks():
     if 'username' not in session:
         return redirect('/login')
     user_name = session['username']
-    return render_template('feed.html', username=user_name)
+    tasks = list(db.session.query(TasksModel))
+    authors = [db.session.query(UsersModel).filter_by(id=i.id).first().name for i in list(db.session.query(UsersModel))]
+    listy = range(len(tasks))
+    users = [db.session.query(UsersModel).filter_by(id=j).first().name for j in [i.user for i in db.session.query(TasksModel)]]
+    return render_template('feed.html', username=user_name, tasks=tasks, listy=listy, id=session['user_id'],authors=authors, users=users)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -67,21 +71,50 @@ def reg():
             return redirect("/login")
     return render_template('registration.html', form=form, existence=existence)
 
+@app.route('/edit-task/<id>', methods=['GET', 'POST'])
+def add_taskid(id):
+    if 'username' not in session:
+        return redirect('/login')
+    form = AddTaskForm()
+    form.user.choices = [(i.id, i.name) for i in db.session.query(UsersModel)]
+    task = db.session.query(TasksModel).filter_by(id=id).first()
+    if task:
+        namey = task.name
+        descy = task.desc
+    else:
+        return redirect('/')
+    name = form.name.data
+    desc = form.desc.data
+    priority = form.priority.data
+    user = form.user.data
+    date = form.date.data
+    if form.validate_on_submit():
+        task.name = name
+        task.desc = desc
+        task.priority = priority
+        task.date = date
+        task.user = user
+        db.session.commit()
+        return redirect('/')
+    return render_template('add_tasks.html', username=session['username'], form=form, name=namey,desc=descy)
+
 @app.route('/add-task', methods=['GET', 'POST'])
 def add_task():
     if 'username' not in session:
         return redirect('/login')
     form = AddTaskForm()
+    form.user.choices = [(i.id, i.name) for i in db.session.query(UsersModel)]
     name = form.name.data
     desc = form.desc.data
     priority = form.priority.data
-    print(priority, desc, name)
+    user = form.user.data
+    date = form.date.data
     if form.validate_on_submit():
-        task = TasksModel(name=name, desc=desc, author=session['username'], date=':'.join(str(datetime.now()).split(':')[:2]), priority=priority)
+        task = TasksModel(name=name, desc=desc, author=session['user_id'], date=date, priority=priority, user=user)
         db.session.add(task)
-        db.commit()
+        db.session.commit()
         return redirect('/')
-    return render_template('add_tasks.html', username=session['username'], form=form)
+    return render_template('add_tasks.html', username=session['username'], form=form, name='', desc='')
 
 
 

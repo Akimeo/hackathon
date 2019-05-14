@@ -7,7 +7,7 @@
         <h5>Author - {{ username }}</h5>
         <p>
             {{ form.name.label }}<br>
-            {{ form.name }}<br>
+            {{ form.name(placeholder=name) }}<br>
             {% for error in form.name.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
@@ -16,7 +16,7 @@
         </p>
                 <p>
             {{ form.desc.label }}<br>
-            {{ form.desc }}<br>
+            {{ form.desc(placeholder=desc) }}<br>
             {% for error in form.desc.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
@@ -27,6 +27,25 @@
             {{ form.priority.label }}<br>
             {{ form.priority }}<br>
             {% for error in form.priority.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+                </p>
+        <p>
+            {{ form.user.label }}<br>
+            {{ form.user }}<br>
+            {% for error in form.user.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.date.label }}<br>
+            {{ form.date }}<br>
+            {% for error in form.date.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
