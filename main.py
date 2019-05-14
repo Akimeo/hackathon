@@ -30,7 +30,9 @@ def tasks():
     listy = range(len(tasks))
     users = [db.session.query(UsersModel).filter_by(id=j).first().name for j in
              [i.user for i in tasks]]
-    return render_template('feed.html', username=user_name, tasks=tasks, listy=listy, id=session['user_id'],authors=authors, users=users, now=datetime.now())
+    admin = db.session.query(UsersModel).filter_by(
+        id=session['user_id']).first().admin
+    return render_template('feed.html', username=user_name, tasks=tasks, listy=listy, id=session['user_id'],authors=authors, users=users, now=datetime.now(), admin=admin)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -50,7 +52,7 @@ def login():
             existence = 'Wrong password'
     elif not (user_name is None and password is None):
         existence = 'This user does not exist'
-    return render_template('login.html', form=form, existence=existence)
+    return render_template('login.html', form=form, existence=existence, admin=0)
 
 @app.route('/logout')
 def logout():
@@ -76,7 +78,7 @@ def reg():
             db.session.add(user)
             db.session.commit()
             return redirect("/login")
-    return render_template('registration.html', form=form, existence=existence)
+    return render_template('registration.html', form=form, existence=existence, admin=0)
 
 @app.route('/edit-task/<id>', methods=['GET', 'POST'])
 def add_taskid(id):
@@ -103,7 +105,8 @@ def add_taskid(id):
         task.user = user
         db.session.commit()
         return redirect('/')
-    return render_template('add_tasks.html', username=session['username'], form=form, name=namey,desc=descy)
+    admin = db.session.query(UsersModel).filter_by(id=session['user_id']).first().admin
+    return render_template('add_tasks.html', username=session['username'], form=form, name=namey,desc=descy, admin=admin)
 
 @app.route('/add-task', methods=['GET', 'POST'])
 def add_task():
@@ -121,7 +124,8 @@ def add_task():
         db.session.add(task)
         db.session.commit()
         return redirect('/')
-    return render_template('add_tasks.html', username=session['username'], form=form, name='', desc='')
+    admin = db.session.query(UsersModel).filter_by(id=session['user_id']).first().admin
+    return render_template('add_tasks.html', username=session['username'], form=form, name='', desc='', admin=admin)
 
 @app.route('/filter-on')
 def filter_on():
@@ -134,6 +138,28 @@ def filter_off():
     global deadlines
     deadlines = True
     return redirect('/')
+
+@app.route('/users')
+def users():
+    if 'username' not in session:
+        return redirect('/login')
+    admin = db.session.query(UsersModel).filter_by(id=session['user_id']).first().admin
+    if admin == 0:
+        return redirect('/')
+    users = list(db.session.query(UsersModel))
+    return render_template('users.html', username=session['username'], users=users, admin=admin)
+
+@app.route('/make-admin/<id>')
+def admin_stuff(id):
+    if 'username' not in session:
+        return redirect('/login')
+    admin = db.session.query(UsersModel).filter_by(id=session['user_id']).first().admin
+    if admin == 0:
+        return redirect('/')
+    db.session.query(UsersModel).filter_by(id=id).first().admin = 1
+    db.session.commit()
+    return redirect('/users')
+
 
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')

@@ -15,6 +15,7 @@
         <h3>Priority - {{ tasks[i].priority }}</h3>
         <div>Deadline: {{ tasks[i].date }}</div>
         <h4>Deligated to {{ users[i] }}</h4>
+        </div>
      {% else %}
         <div class="alert alert-dark" role="alert">
         <h2>{{ tasks[i].name }}</h2>
@@ -24,9 +25,9 @@
         <div>Deadline: {{ tasks[i].date }}</div>
             <h4>Deligated to {{ users[i] }}</h4>
             {% if tasks[i].author == id %}
-            <a href="/edit-task/{{ tasks[i].id}}">Edit Task</a>
-        {% endif %}
+                <a href="/edit-task/{{ tasks[i].id}}">Edit Task</a>
+            {% endif %}
+            </div>
     {% endif %}
-    </div>
 {% endfor %}
 {% endblock %}

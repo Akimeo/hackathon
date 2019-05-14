@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+ 
+{% block content %}
+    <h1>Users</h1>
+{% for item in users %}
+
+        <h5>{{ item.name }}</h5>
+        {% if item.admin == 0 %}
+            <a class="btn btn-primary" href="/make-admin/{{ item.id }}" role="button">Make Them An Admin</a>
+        {% endif %}
+{% endfor %}
+{% endblock %}
