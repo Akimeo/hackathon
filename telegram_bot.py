@@ -1,6 +1,6 @@
 from telegram.ext import Updater, CommandHandler
-from werkzeug.security import check_password_hash
-from db import db, UsersModel
+from werkzeug.security import check_password_hash, generate_password_hash
+from data_base import db, UsersModel
 
 
 help_s = """
@@ -15,15 +15,14 @@ v0.2.0
 
 def start(bot, update):
     usid = update.message['chat']['id']
-    user = UsersModel.query.filter_by(tg_id=usid)
+    user = UsersModel.query.filter_by(tg_id=usid).first()
     if user:
         update.message.reply_text(
             "Добрый день, " + user.name
         )
     else:
         update.message.reply_text(
-            "Необходима авторизация через команду \"/auth логин пароль\"" +
-            user.name
+            "Необходима авторизация через команду \"/auth логин пароль\""
         )
 
 
@@ -63,6 +62,17 @@ def tasks(bot, update):
         update.message.reply_text("Ошибка: вы не авторизованы.")
 
 
+def logout(bot, update):
+    usid = update.message['chat']['id']
+    user = UsersModel.query.filter_by(tg_id=usid).first()
+    if user:
+        user.tg_id = 0
+        db.session.commit()
+        update.message.reply_text("Вы вышли из системы.")
+    else:
+        update.message.reply_text("Ошибка: вы не авторизованы.")
+
+
 def main():
     updater = Updater(token)
     dp = updater.dispatcher
@@ -70,6 +80,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("auth", auth))
     dp.add_handler(CommandHandler("task", tasks))
+    dp.add_handler(CommandHandler("logout", logout))
 
     updater.start_polling()
     updater.idle()
@@ -77,4 +88,10 @@ def main():
 
 if __name__ == '__main__':
     token = '792425593:AAGlpfc1SpGd9l0TRx2llhpe72wmjBO6QIM'
+    """
+    user = UsersModel(
+        name="admin", password_hash=generate_password_hash("admins"))
+    db.session.add(user)
+    db.session.commit()
+    """
     main()

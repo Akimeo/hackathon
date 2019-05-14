@@ -1,31 +1,32 @@
 {% extends "base.html" %}
  
 {% block content %}
-    <h1>Registration</h1>
+    <h1>Add A Task</h1>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
+        <h5>Author - {{ username }}</h5>
         <p>
-            {{ form.username.label }}<br>
-            {{ form.username }}<br>
-            {% for error in form.username.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password }}<br>
-            {% for error in form.password.errors %}
+            {{ form.name.label }}<br>
+            {{ form.name }}<br>
+            {% for error in form.name.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
         </p>
                 <p>
-            {{ form.password2.label }}<br>
-            {{ form.password2 }}<br>
-            {% for error in form.password2.errors %}
+            {{ form.desc.label }}<br>
+            {{ form.desc }}<br>
+            {% for error in form.desc.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+                <p>
+            {{ form.priority.label }}<br>
+            {{ form.priority }}<br>
+            {% for error in form.priority.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
@@ -33,5 +34,4 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-    <h6> {{ existence }}</h6>
 {% endblock %}
